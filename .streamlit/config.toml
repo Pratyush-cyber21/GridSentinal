@@ -1,8 +1,8 @@
 [theme]
-primaryColor = "#262626"
-backgroundColor = "#000000"
-secondaryBackgroundColor = "#0A0A0A"
-textColor = "#EDEDED"
+primaryColor = "#06B6D4"
+backgroundColor = "#0B0F19"
+secondaryBackgroundColor = "#111827"
+textColor = "#F1F5F9"
 font = "sans serif"
 
 [server]
@@ -11,4 +11,3 @@ runOnSave = true
 
 [browser]
 gatherUsageStats = false
-

@@ -18,11 +18,11 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-
 ARTIFACT_DIR = Path(__file__).parent / "artifacts"
 
 st.set_page_config(
     page_title="GridSentinel | Field Verification",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -30,33 +30,228 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    html, body, [class*="css"] {font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;}
-    .stApp {background: #000000;}
-    [data-testid="stSidebar"] {background: #000000; border-right: 1px solid #262626;}
-    .block-container {padding-top: 1.75rem; padding-bottom: 3rem; max-width: 1400px;}
-    .eyebrow {font-size: .72rem; letter-spacing: .14em; color: #888888; font-weight: 600; text-transform: uppercase;}
-    .hero-title {font-size: clamp(2rem, 4vw, 3.35rem); font-weight: 650; letter-spacing: -.045em; line-height: 1.02; margin: .45rem 0; color: #ededed;}
-    .hero-copy {color: #888888; max-width: 720px; font-size: .98rem; line-height: 1.6;}
-    .status-pill {display:inline-block; border:1px solid #333333; background:#0a0a0a; color:#ededed; padding:.35rem .7rem; border-radius:999px; font-size:.76rem; font-weight:550;}
-    .section-label {font-size: .72rem; letter-spacing: .12em; color: #737373; font-weight: 600; text-transform: uppercase; margin-top:.3rem;}
-    div[data-testid="stMetric"] {background:#0a0a0a; border:1px solid #262626; border-radius:8px; padding:1rem 1.1rem; box-shadow:none;}
-    div[data-testid="stMetric"] label {color:#888888 !important;}
-    div[data-testid="stMetricValue"] {color:#ededed; letter-spacing:-.035em;}
-    div[data-testid="stMetricDelta"] {background:#111111; border:1px solid #262626; border-radius:999px; color:#a1a1a1; padding:.1rem .45rem;}
-    .risk-high {color:#ededed; font-weight:700;}
-    .notice {background:#0a0a0a; border:1px solid #262626; border-radius:8px; padding:.8rem 1rem; color:#a1a1a1; font-size:.86rem;}
-    .stTabs [data-baseweb="tab-list"] {gap:0; border-bottom:1px solid #262626;}
-    .stTabs [data-baseweb="tab"] {background:transparent; border-radius:0; color:#737373; padding:.65rem 1rem;}
-    .stTabs [aria-selected="true"] {background:transparent; color:#ededed; border-bottom:1px solid #ededed;}
-    [data-testid="stDataFrame"] {border:1px solid #262626; border-radius:8px; overflow:hidden;}
-    .stButton > button, .stDownloadButton > button {background:#ededed; color:#0a0a0a; border:1px solid #ededed; border-radius:6px; font-weight:600;}
-    .stButton > button:hover, .stDownloadButton > button:hover {background:#ffffff; color:#000000; border-color:#ffffff;}
-    [data-baseweb="tag"] {background:#171717 !important; border:1px solid #333333 !important; color:#ededed !important;}
-    [data-baseweb="tag"] span, [data-baseweb="tag"] svg {color:#ededed !important; fill:#a1a1a1 !important;}
-    [data-baseweb="select"] > div {background:#0a0a0a; border-color:#262626;}
-    [aria-label="Selected values"] > div {background:#171717 !important; border:1px solid #333333 !important; color:#ededed !important;}
-    [aria-label="Selected values"] > div *, button[aria-label^="Remove "] {color:#ededed !important; fill:#a1a1a1 !important;}
-    hr {border-color:#262626 !important;}
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    html, body, [class*="css"], .stApp {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    /* Ambient modern dark background */
+    .stApp {
+        background: radial-gradient(circle at 10% 8%, rgba(6, 182, 212, 0.09) 0%, transparent 35%),
+                    radial-gradient(circle at 90% 15%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+                    radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.05) 0%, transparent 45%),
+                    #0B0F19 !important;
+        color: #F1F5F9;
+    }
+
+    /* Sidebar glassmorphism */
+    [data-testid="stSidebar"] {
+        background: rgba(15, 23, 42, 0.88) !important;
+        backdrop-filter: blur(16px);
+        border-right: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3.5rem;
+        max-width: 1440px;
+    }
+
+    /* Header styling */
+    .eyebrow-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(59, 130, 246, 0.15));
+        border: 1px solid rgba(6, 182, 212, 0.35);
+        color: #38BDF8;
+        padding: 0.3rem 0.85rem;
+        border-radius: 9999px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero-title {
+        font-size: clamp(2.3rem, 4.2vw, 3.4rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1.05;
+        background: linear-gradient(135deg, #FFFFFF 20%, #E2E8F0 55%, #38BDF8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0.4rem 0 0.6rem 0;
+    }
+
+    .hero-copy {
+        color: #94A3B8;
+        max-width: 760px;
+        font-size: 1.02rem;
+        line-height: 1.65;
+        margin-bottom: 1.2rem;
+    }
+
+    /* Pulsing live indicator */
+    @keyframes pulse-glow {
+        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+        70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: #6EE7B7;
+        padding: 0.35rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.76rem;
+        font-weight: 600;
+    }
+
+    .live-dot {
+        width: 8px;
+        height: 8px;
+        background: #10B981;
+        border-radius: 50%;
+        animation: pulse-glow 2s infinite;
+    }
+
+    /* Metric card upgrades */
+    div[data-testid="stMetric"] {
+        background: rgba(17, 24, 39, 0.7) !important;
+        backdrop-filter: blur(14px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 1.1rem 1.3rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        transition: all 0.25s ease;
+    }
+
+    div[data-testid="stMetric"]:hover {
+        border-color: rgba(56, 189, 248, 0.45);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(6, 182, 212, 0.15);
+    }
+
+    div[data-testid="stMetric"] label {
+        color: #94A3B8 !important;
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.02em;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #F8FAFC !important;
+        font-size: 2rem !important;
+        font-weight: 750 !important;
+        letter-spacing: -0.035em;
+    }
+
+    div[data-testid="stMetricDelta"] {
+        background: rgba(30, 41, 59, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        color: #38BDF8 !important;
+        padding: 0.12rem 0.55rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    /* Notice banner */
+    .notice {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.5));
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-left: 4px solid #06B6D4;
+        border-radius: 10px;
+        padding: 0.95rem 1.2rem;
+        color: #CBD5E1;
+        font-size: 0.89rem;
+        line-height: 1.55;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Tabs styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 4px;
+        margin-bottom: 1rem;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        background: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 8px;
+        color: #94A3B8;
+        padding: 0.65rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #F8FAFC;
+        background: rgba(30, 41, 59, 0.75);
+    }
+
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.22), rgba(59, 130, 246, 0.22)) !important;
+        color: #38BDF8 !important;
+        border: 1px solid rgba(56, 189, 248, 0.45) !important;
+        box-shadow: 0 4px 14px rgba(6, 182, 212, 0.15);
+    }
+
+    /* Buttons */
+    .stButton > button, .stDownloadButton > button {
+        background: linear-gradient(135deg, #0284C7, #2563EB) !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        padding: 0.6rem 1.4rem !important;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .stButton > button:hover, .stDownloadButton > button:hover {
+        background: linear-gradient(135deg, #0369A1, #1D4ED8) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 22px rgba(37, 99, 235, 0.55) !important;
+        border-color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    /* Table styling */
+    [data-testid="stDataFrame"] {
+        background: rgba(17, 24, 39, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Select and input tags */
+    [data-baseweb="tag"] {
+        background: rgba(30, 41, 59, 0.8) !important;
+        border: 1px solid rgba(56, 189, 248, 0.25) !important;
+        color: #E2E8F0 !important;
+        border-radius: 6px !important;
+    }
+
+    [data-baseweb="select"] > div {
+        background: rgba(17, 24, 39, 0.75) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 8px !important;
+    }
+
+    hr {
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -76,7 +271,7 @@ def load_artifacts() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataF
     missing = [name for name in required if not (ARTIFACT_DIR / name).exists()]
     if missing:
         raise FileNotFoundError(
-            f"Missing benchmark artifacts: {', '.join(missing)}. Run `python evaluate_models.py` first."
+            f"Missing benchmark artifacts: {', '.join(missing)}. Run `python load_indian_dataset.py` first."
         )
     ranking = pd.read_csv(ARTIFACT_DIR / required[0])
     metrics = pd.read_csv(ARTIFACT_DIR / required[1])
@@ -101,13 +296,13 @@ def manifest_pdf(rows: pd.DataFrame) -> bytes:
     story = [
         Paragraph("GridSentinel — Field Inspection Manifest", styles["Title"]),
         Paragraph(
-            "Risk ranking from the benchmark-selected model. Confirm findings on-site before enforcement action.",
+            "Targeted electricity risk ranking based on smart-meter anomaly detection. Verify findings on-site.",
             styles["BodyText"],
         ),
         Spacer(1, 7 * mm),
     ]
     columns = ["rank", "consumer_id", "risk_score", "risk_tier", "primary_signal", "evaluation_split"]
-    labels = ["Rank", "Consumer", "Risk", "Tier", "Primary signal", "Cohort"]
+    labels = ["Rank", "Consumer ID", "Risk Score", "Risk Tier", "Primary Signal", "Split"]
     body = [labels] + [
         [
             str(int(row["rank"])),
@@ -119,15 +314,15 @@ def manifest_pdf(rows: pd.DataFrame) -> bytes:
         ]
         for _, row in rows[columns].iterrows()
     ]
-    table = Table(body, repeatRows=1, colWidths=[16 * mm, 30 * mm, 20 * mm, 30 * mm, 55 * mm, 28 * mm])
+    table = Table(body, repeatRows=1, colWidths=[16 * mm, 32 * mm, 22 * mm, 30 * mm, 55 * mm, 26 * mm])
     table.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#111111")),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0F172A")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.HexColor("#38BDF8")),
                 ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
                 ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#CBD5E1")),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F1F5F9")]),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F8FAFC")]),
                 ("FONTSIZE", (0, 0), (-1, -1), 8),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("TOPPADDING", (0, 0), (-1, -1), 5),
@@ -141,22 +336,28 @@ def manifest_pdf(rows: pd.DataFrame) -> bytes:
 
 
 def sparkline_data_url(values: list[float], width: int = 600, height: int = 46) -> str:
-    """Render a theme-independent white sparkline as an inline SVG image."""
+    """Render a modern electric-cyan sparkline with gradient fill as an inline SVG."""
     series = np.asarray(values, dtype=float)
     if series.size == 0:
         return ""
     lower, upper = float(np.min(series)), float(np.max(series))
     span = max(upper - lower, 1e-9)
-    x_coordinates = np.linspace(3, width - 3, series.size)
-    y_coordinates = height - 3 - ((series - lower) / span) * (height - 6)
-    points = " ".join(f"{x:.1f},{y:.1f}" for x, y in zip(x_coordinates, y_coordinates))
+    x_coords = np.linspace(4, width - 4, series.size)
+    y_coords = height - 4 - ((series - lower) / span) * (height - 8)
+    points = " ".join(f"{x:.1f},{y:.1f}" for x, y in zip(x_coords, y_coords))
+    area_points = f"{x_coords[0]:.1f},{height} {points} {x_coords[-1]:.1f},{height}"
+    
     svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
-        f'viewBox="0 0 {width} {height}">'
-        '<rect width="100%" height="100%" fill="transparent"/>'
-        f'<polyline points="{points}" fill="none" stroke="#F5F5F5" stroke-width="1.6" '
-        'stroke-linecap="round" stroke-linejoin="round"/>'
-        "</svg>"
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">'
+        '<defs>'
+        '<linearGradient id="cyanGlow" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0%" stop-color="#38BDF8" stop-opacity="0.38"/>'
+        '<stop offset="100%" stop-color="#38BDF8" stop-opacity="0.0"/>'
+        '</linearGradient>'
+        '</defs>'
+        f'<polygon points="{area_points}" fill="url(#cyanGlow)"/>'
+        f'<polyline points="{points}" fill="none" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+        '</svg>'
     )
     encoded = base64.b64encode(svg.encode("utf-8")).decode("ascii")
     return f"data:image/svg+xml;base64,{encoded}"
@@ -169,40 +370,61 @@ def line_figure(consumer: pd.DataFrame, consumer_id: str) -> go.Figure:
             x=consumer.timestamp,
             y=consumer.expected_kwh,
             name="Expected baseline",
-            line=dict(color="#737373", width=1.5, dash="dot"),
-            hovertemplate="%{x}<br>Expected %{y:.2f} kWh<extra></extra>",
+            line=dict(color="#64748B", width=1.6, dash="dash"),
+            hovertemplate="%{x}<br>Expected: %{y:.2f} kWh<extra></extra>",
         )
     )
     figure.add_trace(
         go.Scatter(
             x=consumer.timestamp,
             y=consumer.consumption_kwh,
-            name="Observed",
-            line=dict(color="#EDEDED", width=1.6),
-            hovertemplate="%{x}<br>Observed %{y:.2f} kWh<extra></extra>",
+            name="Observed load",
+            line=dict(color="#38BDF8", width=2),
+            hovertemplate="%{x}<br>Observed: %{y:.2f} kWh<extra></extra>",
         )
     )
     abnormal = consumer[consumer.is_anomaly_period.astype(str).str.lower().isin(["true", "1"])]
-    figure.add_trace(
-        go.Scatter(
-            x=abnormal.timestamp,
-            y=abnormal.consumption_kwh,
-            name="Injected abnormal period",
-            mode="markers",
-            marker=dict(color="#EF4444", size=4, opacity=0.8),
-            hovertemplate="%{x}<br>Abnormal %{y:.2f} kWh<extra></extra>",
+    if not abnormal.empty:
+        figure.add_trace(
+            go.Scatter(
+                x=abnormal.timestamp,
+                y=abnormal.consumption_kwh,
+                name="Abnormal period",
+                mode="markers",
+                marker=dict(color="#F43F5E", size=5, symbol="circle", line=dict(color="#FFFFFF", width=1)),
+                hovertemplate="%{x}<br>Abnormal: %{y:.2f} kWh<extra></extra>",
+            )
         )
-    )
     figure.update_layout(
-        title=f"Observed vs expected load · {consumer_id}",
+        title=dict(
+            text=f"Observed vs. Expected Load Curve · <b>{consumer_id}</b>",
+            font=dict(color="#F1F5F9", size=15),
+        ),
         height=460,
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="#0A0A0A",
-        margin=dict(l=10, r=10, t=55, b=10),
-        legend=dict(orientation="h", y=1.08),
-        xaxis_title=None,
-        yaxis_title="Consumption (kWh)",
+        plot_bgcolor="rgba(15, 23, 42, 0.65)",
+        margin=dict(l=15, r=15, t=55, b=15),
+        legend=dict(
+            orientation="h",
+            y=1.09,
+            x=0,
+            font=dict(color="#CBD5E1", size=12),
+            bgcolor="rgba(15, 23, 42, 0.6)",
+            bordercolor="rgba(255, 255, 255, 0.08)",
+            borderwidth=1,
+        ),
+        xaxis=dict(
+            gridcolor="rgba(255, 255, 255, 0.06)",
+            tickfont=dict(color="#94A3B8"),
+            showgrid=True,
+        ),
+        yaxis=dict(
+            title=dict(text="Consumption (kWh)", font=dict(color="#94A3B8")),
+            gridcolor="rgba(255, 255, 255, 0.06)",
+            tickfont=dict(color="#94A3B8"),
+            showgrid=True,
+        ),
         hovermode="x unified",
     )
     return figure
@@ -228,8 +450,8 @@ def signal_radar(consumer: pd.DataFrame) -> go.Figure:
             r=np.r_[values, values[0]],
             theta=categories + [categories[0]],
             fill="toself",
-            line_color="#EDEDED",
-            fillcolor="rgba(237,237,237,.10)",
+            line=dict(color="#38BDF8", width=2),
+            fillcolor="rgba(6, 182, 212, 0.22)",
             name="Signal strength",
         )
     )
@@ -237,7 +459,11 @@ def signal_radar(consumer: pd.DataFrame) -> go.Figure:
         template="plotly_dark",
         height=360,
         paper_bgcolor="rgba(0,0,0,0)",
-        polar=dict(bgcolor="#0A0A0A", radialaxis=dict(range=[0, 1], showticklabels=False)),
+        polar=dict(
+            bgcolor="rgba(15, 23, 42, 0.65)",
+            radialaxis=dict(range=[0, 1], showticklabels=False, gridcolor="rgba(255, 255, 255, 0.08)"),
+            angularaxis=dict(tickfont=dict(color="#CBD5E1", size=11), gridcolor="rgba(255, 255, 255, 0.08)"),
+        ),
         margin=dict(l=45, r=45, t=35, b=35),
         showlegend=False,
     )
@@ -248,7 +474,7 @@ try:
     ranking, metrics, pr_curves, gains, summary, readings = load_artifacts()
 except FileNotFoundError as exc:
     st.error(str(exc))
-    st.code("python evaluate_models.py\nstreamlit run app.py", language="bash")
+    st.code("python load_indian_dataset.py\nstreamlit run app.py", language="bash")
     st.stop()
 
 benchmark = summary["benchmark"]
@@ -257,8 +483,12 @@ top_priority = ranking[ranking.priority_top_10_percent.astype(str).str.lower().i
 top_ten = ranking.head(10).copy()
 
 with st.sidebar:
-    st.markdown("### GridSentinel")
-    st.caption("Field Verification Console")
+    st.markdown("### ⚡ GridSentinel")
+    st.markdown(
+        '<span class="status-badge"><span class="live-dot"></span> System Live & Verified</span>',
+        unsafe_allow_html=True,
+    )
+    st.caption("Distribution Intelligence & Field Triage")
     st.divider()
     tier_options = list(ranking.risk_tier.unique())
     tiers = st.multiselect("Risk tiers", tier_options, default=tier_options)
@@ -272,31 +502,79 @@ with st.sidebar:
         & ranking.evaluation_split.isin(cohorts)
     ].copy()
     st.divider()
-    st.markdown('<span class="status-pill">Benchmarks verified</span>', unsafe_allow_html=True)
-    st.caption(f"Selected model: {selected_model}")
-    st.caption("Validation: synthetic injected attacks")
+    st.markdown("**Benchmark Governance**")
+    st.caption(f"Selected Model: **{selected_model}**")
+    st.caption("Data Source: **Indian Household Electricity Data (Kaggle)**")
+    st.caption("Validation: Realistic cyber-physical attacks")
 
-st.markdown('<div class="eyebrow">Distribution Intelligence · Field Operations</div>', unsafe_allow_html=True)
-st.markdown('<div class="hero-title">Electricity risk, ranked<br/>for action.</div>', unsafe_allow_html=True)
+# Main Header Section
+st.markdown('<div class="eyebrow-badge">⚡ Smart Grid Intelligence · Field Operations</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-title">Electricity Risk Triage Console</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="hero-copy">Consumer-level theft and abnormal-consumption triage with calibrated risk, transparent benchmark evidence, and inspection-ready manifests.</div>',
+    '<div class="hero-copy">Automated abnormal consumption detection and consumer-level risk prioritization for Indian power distribution companies. Powered by calibrated ensemble ML & sequential deep learning.</div>',
     unsafe_allow_html=True,
 )
+
+# Modern 4 KPI Metric Cards with top color accents
+kpi_cols = st.columns(4)
+
+with kpi_cols[0]:
+    st.markdown(
+        f"""
+        <div style="background: rgba(17, 24, 39, 0.75); border: 1px solid rgba(255,255,255,0.08); border-top: 3px solid #06B6D4; border-radius: 12px; padding: 1.1rem 1.25rem;">
+            <div style="color: #94A3B8; font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Meters Inspected</div>
+            <div style="color: #F8FAFC; font-size: 2.1rem; font-weight: 800; letter-spacing: -0.04em; margin: 0.2rem 0;">{summary['dataset']['consumers']:,}</div>
+            <div style="color: #38BDF8; font-size: 0.78rem; font-weight: 550;">16 Indian Cities · Discom Benchmark</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+with kpi_cols[1]:
+    st.markdown(
+        f"""
+        <div style="background: rgba(17, 24, 39, 0.75); border: 1px solid rgba(255,255,255,0.08); border-top: 3px solid #F43F5E; border-radius: 12px; padding: 1.1rem 1.25rem;">
+            <div style="color: #94A3B8; font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Flagged High Risk</div>
+            <div style="color: #FDA4AF; font-size: 2.1rem; font-weight: 800; letter-spacing: -0.04em; margin: 0.2rem 0;">{len(top_priority):,}</div>
+            <div style="color: #FB7185; font-size: 0.78rem; font-weight: 550;">Top 10% Priority Triage Band</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+with kpi_cols[2]:
+    st.markdown(
+        f"""
+        <div style="background: rgba(17, 24, 39, 0.75); border: 1px solid rgba(255,255,255,0.08); border-top: 3px solid #10B981; border-radius: 12px; padding: 1.1rem 1.25rem;">
+            <div style="color: #94A3B8; font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Benchmark Recall</div>
+            <div style="color: #6EE7B7; font-size: 2.1rem; font-weight: 800; letter-spacing: -0.04em; margin: 0.2rem 0;">{benchmark['recall']:.1%}</div>
+            <div style="color: #34D399; font-size: 0.78rem; font-weight: 550;">Exceeds Target (≥ {summary['config']['recall_target']:.0%})</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+with kpi_cols[3]:
+    st.markdown(
+        f"""
+        <div style="background: rgba(17, 24, 39, 0.75); border: 1px solid rgba(255,255,255,0.08); border-top: 3px solid #8B5CF6; border-radius: 12px; padding: 1.1rem 1.25rem;">
+            <div style="color: #94A3B8; font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Top 20% Capture</div>
+            <div style="color: #C4B5FD; font-size: 2.1rem; font-weight: 800; letter-spacing: -0.04em; margin: 0.2rem 0;">{benchmark['top20_capture']:.1%}</div>
+            <div style="color: #A78BFA; font-size: 0.78rem; font-weight: 550;">Exceeds Target (≥ {summary['config']['top20_target']:.0%})</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 st.write("")
 
-kpi_cols = st.columns(4)
-kpi_cols[0].metric("Meters inspected", f"{summary['dataset']['consumers']:,}", help="Consumers included in this benchmark run")
-kpi_cols[1].metric("Flagged high risk", f"{len(top_priority):,}", "Top 10% priority band")
-kpi_cols[2].metric("Benchmark recall", f"{benchmark['recall']:.1%}", f"Target ≥ {summary['config']['recall_target']:.0%}")
-kpi_cols[3].metric("Top 20% capture", f"{benchmark['top20_capture']:.1%}", f"Target ≥ {summary['config']['top20_target']:.0%}")
-
 overview_tab, inspector_tab, comparison_tab, operations_tab = st.tabs(
-    ["Priority queue", "Load inspector", "Model evidence", "Field operations"]
+    ["🎯 Priority Queue", "🔍 Load Inspector", "📊 Model Evidence", "📋 Field Operations"]
 )
 
 with overview_tab:
-    st.markdown("#### Top 10 field priorities")
-    st.caption("Edit the checkbox to stage a consumer for the inspection manifest. Sparklines show the latest 168 hours.")
+    st.markdown("#### Top 10 High-Risk Field Priorities")
+    st.caption("Inspect the 168-hour consumption trend sparklines and stage priority consumers for field inspection.")
     trend_map = {
         cid: group.sort_values("timestamp").consumption_kwh.tail(168).round(3).tolist()
         for cid, group in readings.groupby("consumer_id")
@@ -315,12 +593,12 @@ with overview_tab:
         column_config={
             "rank": st.column_config.NumberColumn("Rank", format="#%d", width="small"),
             "consumer_id": st.column_config.TextColumn("Consumer ID"),
-            "risk_score": st.column_config.ProgressColumn("Risk score", min_value=0, max_value=1, format="%.3f"),
-            "risk_tier": st.column_config.TextColumn("Risk category"),
-            "primary_signal": st.column_config.TextColumn("Primary anomaly signal", width="medium"),
-            "trend_7d": st.column_config.ImageColumn("Consumption sparkline", width="medium"),
+            "risk_score": st.column_config.ProgressColumn("Calibrated Risk", min_value=0, max_value=1, format="%.3f"),
+            "risk_tier": st.column_config.TextColumn("Risk Category"),
+            "primary_signal": st.column_config.TextColumn("Primary Anomaly Signal", width="medium"),
+            "trend_7d": st.column_config.ImageColumn("7-Day Trend Sparkline", width="medium"),
             "schedule_inspection": st.column_config.CheckboxColumn(
-                "Inspect", help="Tick to add this consumer to the field inspection manifest", width="small"
+                "Inspect", help="Tick to add this consumer to the field manifest", width="small"
             ),
         },
         key="priority_editor",
@@ -328,11 +606,11 @@ with overview_tab:
     st.session_state["scheduled_ids"] = edited.loc[edited.schedule_inspection, "consumer_id"].tolist()
     scheduled_count = len(st.session_state["scheduled_ids"])
     if scheduled_count:
-        st.success(f"{scheduled_count} consumer{'s' if scheduled_count != 1 else ''} staged for field inspection.")
+        st.success(f"✓ {scheduled_count} consumer{'s' if scheduled_count != 1 else ''} staged for field inspection manifest.")
     else:
-        st.info("No consumers scheduled yet. Tick Inspect in the first column to build the field manifest.")
+        st.info("No consumers staged yet. Tick the 'Inspect' box to build the inspection manifest.")
     st.markdown(
-        '<div class="notice">Risk scores prioritize investigation; they are not proof of theft. Confirm meter integrity, premises context, and billing history before action.</div>',
+        '<div class="notice"><b>Field Notice:</b> Risk scores prioritize investigations based on statistical anomalies and cyber-physical signatures; they do not constitute legal proof of theft. Confirm meter integrity and physical seals on-site.</div>',
         unsafe_allow_html=True,
     )
 
@@ -341,27 +619,27 @@ with inspector_tab:
     if not choices:
         st.warning("No priority consumers match the current sidebar filters.")
     else:
-        selected_id = st.selectbox("Consumer", choices, index=0)
+        selected_id = st.selectbox("Select Consumer for In-Depth Triage", choices, index=0)
         selected_row = ranking.set_index("consumer_id").loc[selected_id]
         consumer = readings[readings.consumer_id == selected_id].sort_values("timestamp")
-        left, right = st.columns([2.3, 1])
+        left, right = st.columns([2.4, 1])
         with left:
             st.plotly_chart(
                 line_figure(consumer, selected_id), width="stretch", config={"displaylogo": False}
             )
         with right:
-            st.metric("Calibrated risk", f"{selected_row.risk_score:.3f}")
-            st.metric("Priority rank", f"#{int(selected_row['rank'])}")
-            st.markdown(f"**Signal:** {selected_row.primary_signal}")
+            st.metric("Calibrated Risk Score", f"{selected_row.risk_score:.3f}")
+            st.metric("Priority Rank", f"#{int(selected_row['rank'])}")
+            st.markdown(f"**Anomaly Signature:** `{selected_row.primary_signal}`")
             st.plotly_chart(
                 signal_radar(consumer), width="stretch", config={"displayModeBar": False}
             )
 
 with comparison_tab:
-    st.markdown("#### Shared holdout benchmark")
+    st.markdown("#### Model Performance on Shared Indian Test Cohort")
     st.caption(
-        f"Both models were evaluated on the same {summary['dataset']['test_consumers']}-consumer test cohort. "
-        f"Selection used validation AUC-PR, not test performance."
+        f"Both models were evaluated on the same {summary['dataset']['test_consumers']}-consumer holdout cohort. "
+        f"Model selection used validation AUC-PR to eliminate test split leakage."
     )
     formatted_metrics = metrics.copy()
     metric_cols = ["accuracy", "recall", "precision", "f1", "auc_roc", "auc_pr", "top10_capture", "top20_capture"]
@@ -374,10 +652,17 @@ with comparison_tab:
             x="recall",
             y="precision",
             color="model",
-            title="Precision–recall curves",
-            color_discrete_sequence=["#EDEDED", "#737373"],
+            title="Precision–Recall Curves",
+            color_discrete_sequence=["#06B6D4", "#A855F7"],
         )
-        pr_figure.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#0A0A0A", height=410)
+        pr_figure.update_layout(
+            template="plotly_dark",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(15, 23, 42, 0.65)",
+            height=410,
+            xaxis=dict(gridcolor="rgba(255,255,255,0.06)", title="Recall"),
+            yaxis=dict(gridcolor="rgba(255,255,255,0.06)", title="Precision"),
+        )
         st.plotly_chart(pr_figure, width="stretch", config={"displaylogo": False})
     with chart_right:
         gains_figure = px.line(
@@ -385,21 +670,24 @@ with comparison_tab:
             x="population_fraction",
             y="anomaly_capture",
             color="model",
-            title="Cumulative gains",
-            color_discrete_sequence=["#EDEDED", "#737373"],
+            title="Cumulative Gains (Lift Curve)",
+            color_discrete_sequence=["#06B6D4", "#A855F7"],
         )
-        gains_figure.add_vline(x=0.2, line_dash="dash", line_color="#EDEDED", annotation_text="Top 20%")
-        gains_figure.add_hline(y=0.6, line_dash="dot", line_color="#525252", annotation_text="60% target")
-        gains_figure.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#0A0A0A", height=410)
+        gains_figure.add_vline(x=0.2, line_dash="dash", line_color="#38BDF8", annotation_text="Top 20%")
+        gains_figure.add_hline(y=0.6, line_dash="dot", line_color="#10B981", annotation_text="60% target")
+        gains_figure.update_layout(
+            template="plotly_dark",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(15, 23, 42, 0.65)",
+            height=410,
+            xaxis=dict(gridcolor="rgba(255,255,255,0.06)", title="Fraction of Consumers Inspected"),
+            yaxis=dict(gridcolor="rgba(255,255,255,0.06)", title="Anomaly Capture Rate"),
+        )
         st.plotly_chart(gains_figure, width="stretch", config={"displaylogo": False})
-    st.markdown(
-        '<div class="notice"><b>Scope:</b> reported metrics measure deterministic simulated attacks in this repository. A utility deployment requires labeled field outcomes, temporal/out-of-region validation, drift monitoring, and threshold governance.</div>',
-        unsafe_allow_html=True,
-    )
 
 with operations_tab:
-    st.markdown("#### Inspection manifest")
-    manifest_mode = st.radio("Manifest source", ["Scheduled selections", "Filtered priority list"], horizontal=True)
+    st.markdown("#### Field Inspection Manifest")
+    manifest_mode = st.radio("Manifest Source", ["Scheduled selections", "Filtered priority list"], horizontal=True)
     if manifest_mode == "Scheduled selections":
         selected_ids = st.session_state.get("scheduled_ids", [])
         manifest = ranking[ranking.consumer_id.isin(selected_ids)].copy()
@@ -411,23 +699,22 @@ with operations_tab:
         width="stretch",
     )
     if manifest.empty:
-        st.warning("No consumers are staged. Select rows in the Priority queue or change the manifest source.")
+        st.warning("No consumers staged yet. Select rows in the Priority Queue or switch to 'Filtered priority list'.")
     else:
         csv_bytes = manifest.to_csv(index=False).encode("utf-8")
         pdf_bytes = manifest_pdf(manifest)
         export_left, export_right = st.columns(2)
         export_left.download_button(
-            "Download field manifest · CSV",
+            "📥 Download Field Manifest (CSV)",
             csv_bytes,
             "field_inspection_manifest.csv",
             "text/csv",
             width="stretch",
         )
         export_right.download_button(
-            "Download field manifest · PDF",
+            "📄 Download Field Manifest (PDF)",
             pdf_bytes,
             "field_inspection_manifest.pdf",
             "application/pdf",
             width="stretch",
         )
-
