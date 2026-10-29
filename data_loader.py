@@ -31,7 +31,7 @@ def _consumer_curve(
     timestamps: pd.DatetimeIndex, rng: np.random.Generator
 ) -> np.ndarray:
     hour = timestamps.hour.to_numpy()
-    weekday = timestamps.dayofweek.to_numpy() < 5
+    weekday = timestamps.day_of_week.to_numpy() < 5
     base = rng.uniform(0.45, 1.8)
     morning = rng.uniform(0.35, 0.9) * np.exp(-0.5 * ((hour - 8) / 2.2) ** 2)
     evening = rng.uniform(0.7, 1.7) * np.exp(-0.5 * ((hour - 20) / 2.8) ** 2)

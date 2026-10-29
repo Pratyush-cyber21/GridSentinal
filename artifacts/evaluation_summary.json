@@ -6,7 +6,7 @@
     "theft_rate": 0.125,
     "recall_target": 0.75,
     "top20_target": 0.6,
-    "lstm_epochs": 24
+    "lstm_epochs": 20
   },
   "dataset": {
     "readings": 537600,
@@ -23,38 +23,38 @@
     "LSTM": 1.0
   },
   "benchmark": {
-    "accuracy": 0.96875,
-    "recall": 0.75,
+    "accuracy": 1.0,
+    "recall": 1.0,
     "precision": 1.0,
-    "f1": 0.8571428571428571,
+    "f1": 1.0,
     "auc_roc": 1.0,
     "auc_pr": 1.0,
     "top10_capture": 0.875,
     "top20_capture": 1.0,
-    "threshold": 0.8516501238479707
+    "threshold": 0.5829010626499609
   },
   "models": {
     "Random Forest": {
-      "accuracy": 0.96875,
-      "recall": 0.75,
+      "accuracy": 1.0,
+      "recall": 1.0,
       "precision": 1.0,
-      "f1": 0.8571428571428571,
+      "f1": 1.0,
       "auc_roc": 1.0,
       "auc_pr": 1.0,
       "top10_capture": 0.875,
       "top20_capture": 1.0,
-      "threshold": 0.8516501238479707
+      "threshold": 0.5829010626499609
     },
     "LSTM": {
-      "accuracy": 0.96875,
-      "recall": 0.75,
+      "accuracy": 0.984375,
+      "recall": 0.875,
       "precision": 1.0,
-      "f1": 0.8571428571428571,
-      "auc_roc": 1.0,
-      "auc_pr": 1.0,
+      "f1": 0.9333333333333333,
+      "auc_roc": 0.9910714285714286,
+      "auc_pr": 0.9583333333333333,
       "top10_capture": 0.875,
       "top20_capture": 1.0,
-      "threshold": 0.8425021767616272
+      "threshold": 0.8462258577346802
     }
   }
 }

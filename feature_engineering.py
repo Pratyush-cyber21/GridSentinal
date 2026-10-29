@@ -44,7 +44,7 @@ def extract_consumer_features(data: pd.DataFrame) -> pd.DataFrame:
     """Collapse hourly readings into statistical, temporal and anomaly features."""
     frame = data.sort_values(["consumer_id", "timestamp"]).copy()
     frame["hour"] = frame["timestamp"].dt.hour
-    frame["weekday"] = frame["timestamp"].dt.dayofweek < 5
+    frame["weekday"] = frame["timestamp"].dt.day_of_week < 5
     neighborhood = frame.groupby("timestamp")["consumption_kwh"].mean().rename("neighborhood")
     frame = frame.join(neighborhood, on="timestamp")
     rows: list[dict[str, float | int | str]] = []

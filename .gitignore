@@ -8,4 +8,5 @@ artifacts/*.pt
 artifacts/*.joblib
 artifacts/priority_meter_readings.csv
 artifacts-smoke/
+data/*.csv
 

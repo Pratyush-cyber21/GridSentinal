@@ -80,7 +80,7 @@ def train_lstm(
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = TheftLSTM().to(device)
     x_train = torch.as_tensor(train_sequences, dtype=torch.float32)
-    y_train = torch.as_tensor(train_labels, dtype=torch.float32)
+    y_train = torch.as_tensor(np.array(train_labels, copy=True), dtype=torch.float32)
     loader = DataLoader(TensorDataset(x_train, y_train), batch_size=batch_size, shuffle=True)
     positive = max(float(train_labels.sum()), 1.0)
     pos_weight = torch.tensor([(len(train_labels) - positive) / positive], device=device)
@@ -88,7 +88,7 @@ def train_lstm(
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=3)
     validation_x = torch.as_tensor(validation_sequences, dtype=torch.float32, device=device)
-    validation_y = torch.as_tensor(validation_labels, dtype=torch.float32, device=device)
+    validation_y = torch.as_tensor(np.array(validation_labels, copy=True), dtype=torch.float32, device=device)
     best_state: dict[str, torch.Tensor] | None = None
     best_loss = float("inf")
     patience_left = 7

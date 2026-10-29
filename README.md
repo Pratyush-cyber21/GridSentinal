@@ -104,6 +104,21 @@ python evaluate_models.py --data .\data\meter_readings.csv
 
 When `label` is absent it defaults to benign, so supervised evaluation is not meaningful until confirmed labels are supplied. Optional columns are `expected_kwh`, `label`, `attack_type`, `primary_signal`, and `is_anomaly_period`.
 
+## Indian Household Smart-Meter Dataset (Kaggle)
+
+GridSentinel includes built-in automated support for the Indian Household Electricity Bill dataset (`suraj520/indian-household-electricity-bill`):
+
+```bash
+python load_indian_dataset.py --consumers 320 --days 70 --epochs 20
+```
+
+This end-to-end pipeline:
+1. Downloads the 45,345-household dataset from Kaggle via `kagglehub`.
+2. Synthesizes hourly smart-meter load curves grounded in Indian appliance ownership (Fans, Refrigerators, ACs, TVs) and monthly billing tariffs across 16 Indian cities.
+3. Injects realistic cyber-physical smart-meter attacks (sudden drops, flatlines, intermittent peak bypass, peak/off-peak inversion) alongside natural benign variations.
+4. Evaluates both Random Forest and LSTM models against project benchmark criteria ($\ge 75\%$ recall, $\ge 60\%$ top-20% anomaly capture).
+5. Refreshes all dashboard artifacts for field triage.
+
 ## Reproduce and test
 
 ```powershell
